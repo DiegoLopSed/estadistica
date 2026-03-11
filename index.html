@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IA en la formación universitaria</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f5f7fb;
+      color: #1f2933;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 1.75rem;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 1.6rem;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    p.descripcion {
+      text-align: center;
+      color: #4b5563;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    .seccion {
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .seccion-titulo {
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: #111827;
+      font-size: 1rem;
+    }
+
+    .pregunta {
+      margin-bottom: 1.25rem;
+    }
+
+    .pregunta-label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+    }
+
+    .ayuda {
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-bottom: 0.3rem;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 0.55rem 0.7rem;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      font-size: 0.9rem;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      background: #f9fafb;
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+      background: #ffffff;
+    }
+
+    .opciones {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 1.5rem;
+      margin-top: 0.2rem;
+      font-size: 0.9rem;
+    }
+
+    .opcion {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .mixta-extra {
+      margin-top: 0.4rem;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+      color: white;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      margin-top: 0.75rem;
+      box-shadow: 0 10px 20px rgba(37, 99, 235, 0.4);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+    }
+
+    button[type="submit"]:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+      box-shadow: 0 14px 24px rgba(37, 99, 235, 0.45);
+    }
+
+    button[type="submit"]:active {
+      transform: translateY(0);
+      box-shadow: 0 8px 16px rgba(37, 99, 235, 0.35);
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #9ca3af;
+      margin-top: 1rem;
+    }
+
+    @media (min-width: 640px) {
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <form class="card">
+      <h1>Inteligencia Artificial en la formación universitaria</h1>
+      <p class="descripcion">
+        Encuesta sobre uso y acceso a herramientas de IA en estudiantes de Ingeniería en Sistemas.
+        Tus respuestas son confidenciales y se utilizarán solo con fines académicos.
+      </p>
+
+      <!-- PREGUNTAS ABIERTAS (4) -->
+      <div class="seccion">
+        <div class="seccion-titulo">Preguntas abiertas</div>
+
+        <div class="pregunta">
+          <label class="pregunta-label" for="abierta1">
+            1. ¿Qué entiendes por Inteligencia Artificial aplicada a la educación universitaria?
+          </label>
+          <textarea id="abierta1" name="abierta1"></textarea>
+        </div>
+
+        <div class="grid-2">
+          <div class="pregunta">
+            <label class="pregunta-label" for="edad">2. Edad</label>
+            <input type="text" id="edad" name="edad" placeholder="Ejemplo: 21" />
+          </div>
+
+          <div class="pregunta">
+            <label class="pregunta-label" for="semestre">3. Semestre actual</label>
+            <input type="text" id="semestre" name="semestre" placeholder="Ejemplo: 5° semestre" />
+          </div>
+        </div>
+
+        <div class="pregunta">
+          <label class="pregunta-label" for="abierta2">
+            4. Describe cómo has utilizado alguna herramienta de IA en tus estudios de Ingeniería en Sistemas.
+          </label>
+          <textarea id="abierta2" name="abierta2"></textarea>
+        </div>
+
+        <div class="pregunta">
+          <label class="pregunta-label" for="abierta3">
+            5. ¿Qué beneficios consideras que aporta la IA a tu proceso de aprendizaje?
+          </label>
+          <textarea id="abierta3" name="abierta3"></textarea>
+        </div>
+
+        <div class="pregunta">
+          <label class="pregunta-label" for="abierta4">
+            6. ¿Qué riesgos o preocupaciones te genera el uso de IA en la formación universitaria?
+          </label>
+          <textarea id="abierta4" name="abierta4"></textarea>
+        </div>
+      </div>
+
+      <!-- PREGUNTAS CERRADAS (4) -->
+      <div class="seccion">
+        <div class="seccion-titulo">Preguntas cerradas</div>
+
+        <div class="pregunta">
+          <span class="pregunta-label">
+            7. ¿Tienes acceso regular a herramientas de IA (por ejemplo, chatbots, asistentes de código, generadores de texto/imágenes)?
+          </span>
+          <div class="opciones">
+            <label class="opcion">
+              <input type="radio" name="cerrada1" value="si" /> Sí
+            </label>
+            <label class="opcion">
+              <input type="radio" name="cerrada1" value="no" /> No
+            </label>
+          </div>
+        </div>
+
+        <div class="pregunta">
+          <span class="pregunta-label">
+            8. ¿La universidad ofrece formación formal (cursos, talleres, charlas) sobre el uso de IA en tu carrera?
+          </span>
+          <div class="opciones">
+            <label class="opcion">
+              <input type="radio" name="cerrada2" value="si" /> Sí
+            </label>
+            <label class="opcion">
+              <input type="radio" name="cerrada2" value="no" /> No
+            </label>
+            <label class="opcion">
+              <input type="radio" name="cerrada2" value="no_sabe" /> No lo sé
+            </label>
+          </div>
+        </div>
+
+        <div class="pregunta">
+          <span class="pregunta-label">
+            9. En general, ¿consideras positivo el impacto de la IA en tu formación universitaria?
+          </span>
+          <div class="opciones">
+            <label class="opcion">
+              <input type="radio" name="cerrada3" value="muy_positivo" /> Muy positivo
+            </label>
+            <label class="opcion">
+              <input type="radio" name="cerrada3" value="positivo" /> Positivo
+            </label>
+            <label class="opcion">
+              <input type="radio" name="cerrada3" value="neutro" /> Neutro
+            </label>
+            <label class="opcion">
+              <input type="radio" name="cerrada3" value="negativo" /> Negativo
+            </label>
+            <label class="opcion">
+              <input type="radio" name="cerrada3" value="muy_negativo" /> Muy negativo
+            </label>
+          </div>
+        </div>
+
+        <div class="pregunta">
+          <span class="pregunta-label">
+            10. ¿Usas herramientas de IA al menos una vez por semana para tareas académicas?
+          </span>
+          <div class="opciones">
+            <label class="opcion">
+              <input type="radio" name="cerrada4" value="si" /> Sí
+            </label>
+            <label class="opcion">
+              <input type="radio" name="cerrada4" value="no" /> No
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- PREGUNTAS MIXTAS (4) -->
+      <div class="seccion">
+        <div class="seccion-titulo">Preguntas mixtas</div>
+
+        <div class="pregunta">
+          <span class="pregunta-label">
+            11. ¿En qué medida la IA te ayuda a comprender mejor los contenidos de tus asignaturas?
+          </span>
+          <p class="ayuda">Selecciona una opción y, si lo deseas, explica brevemente.</p>
+          <div class="opciones">
+            <label class="opcion">
+              <input type="radio" name="mixta1" value="mucho" /> Mucho
+            </label>
+            <label class="opcion">
+              <input type="radio" name="mixta1" value="algo" /> Algo
+            </label>
+            <label class="opcion">
+              <input type="radio" name="mixta1" value="poco" /> Poco
+            </label>
+            <label class="opcion">
+              <input type="radio" name="mixta1" value="nada" /> Nada
+            </label>
+          </div>
+          <textarea class="mixta-extra" name="mixta1_exp" placeholder="Explica brevemente tu respuesta (opcional)"></textarea>
+        </div>
+
+        <div class="pregunta">
+          <span class="pregunta-label">
+            12. ¿Qué herramientas de IA utilizas con mayor frecuencia en tus estudios?
+          </span>
+          <p class="ayuda">Selecciona una o varias opciones y, si usas otra, escríbela.</p>
+          <div class="opciones">
+            <label class="opcion">
+              <input type="checkbox" name="mixta2_herramientas" value="chatgpt" /> ChatGPT u otros chatbots de texto
+            </label>
+            <label class="opcion">
+              <input type="checkbox" name="mixta2_herramientas" value="asistentes_codigo" /> Asistentes de código (por ejemplo, GitHub Copilot)
+            </label>
+            <label class="opcion">
+              <input type="checkbox" name="mixta2_herramientas" value="generadores_imagen" /> Generadores de imágenes (por ejemplo, DALL·E, Midjourney)
+            </label>
+            <label class="opcion">
+              <input type="checkbox" name="mixta2_herramientas" value="otras" /> Otras
+            </label>
+          </div>
+          <textarea class="mixta-extra" name="mixta2_exp" placeholder="Menciona otras herramientas de IA que utilices o detalla cómo las usas."></textarea>
+        </div>
+
+        <div class="pregunta">
+          <span class="pregunta-label">
+            13. ¿Te sientes orientado por tus docentes sobre el uso ético de la IA en tus trabajos académicos?
+          </span>
+          <p class="ayuda">Selecciona una opción y, si lo deseas, da un ejemplo.</p>
+          <div class="opciones">
+            <label class="opcion">
+              <input type="radio" name="mixta3" value="si_suficiente" /> Sí, de forma suficiente
+            </label>
+            <label class="opcion">
+              <input type="radio" name="mixta3" value="si_parcial" /> Sí, pero de forma parcial
+            </label>
+            <label class="opcion">
+              <input type="radio" name="mixta3" value="no" /> No
+            </label>
+          </div>
+          <textarea class="mixta-extra" name="mixta3_exp" placeholder="Ejemplo o comentario adicional (opcional)"></textarea>
+        </div>
+
+        <div class="pregunta">
+          <span class="pregunta-label">
+            14. En relación con el acceso, ¿consideras que todos los estudiantes de tu programa tienen las mismas oportunidades para utilizar IA?
+          </span>
+          <p class="ayuda">Selecciona una opción y comenta las razones.</p>
+          <div class="opciones">
+            <label class="opcion">
+              <input type="radio" name="mixta4" value="si" /> Sí
+            </label>
+            <label class="opcion">
+              <input type="radio" name="mixta4" value="no" /> No
+            </label>
+              <label class="opcion">
+              <input type="radio" name="mixta4" value="no_seguro" /> No estoy seguro(a)
+            </label>
+          </div>
+          <textarea class="mixta-extra" name="mixta4_exp" placeholder="Comenta brevemente las razones (económicas, tecnológicas, institucionales, etc.)"></textarea>
+        </div>
+      </div>
+
+      <button type="submit">Enviar respuestas</button>
+
+      <div class="footer">
+        Gracias por tu participación.
+      </div>
+    </form>
+  </div>
+</body>
+</html>
