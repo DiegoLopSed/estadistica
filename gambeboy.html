@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Game Boy Color - Ficha Técnica</title>
+  <style>
+    :root{
+      --bg: #0b1220;
+      --panel: rgba(255,255,255,0.06);
+      --panel-2: rgba(255,255,255,0.09);
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.70);
+      --accent: #62f6c4;
+      --accent-2: #7aa7ff;
+      --border: rgba(255,255,255,0.14);
+      --shadow: rgba(0,0,0,0.35);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+
+    body{
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      background: radial-gradient(1200px 600px at 20% 0%, rgba(98,246,196,0.16), transparent 60%),
+                  radial-gradient(900px 500px at 95% 20%, rgba(122,167,255,0.14), transparent 55%),
+                  var(--bg);
+      color: var(--text);
+      line-height: 1.35;
+    }
+
+    .wrap{
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 18px 14px 28px;
+    }
+
+    .topbar{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .title{
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .title h1{
+      margin: 0;
+      font-size: clamp(18px, 2.3vw, 22px);
+      letter-spacing: 0.2px;
+    }
+
+    .title p{
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .layout{
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+      gap: clamp(10px, 2vw, 14px);
+      align-items: start;
+    }
+
+    @media (max-width: 900px){
+      .layout{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 18px 40px var(--shadow);
+      overflow: hidden;
+    }
+
+    .canvasCard{
+      position: relative;
+      min-height: 0;
+    }
+
+    #gb-canvas{
+      width: 100%;
+      height: clamp(320px, 45vh, 520px);
+      display: block;
+    }
+
+    .canvasHUD{
+      position: absolute;
+      inset: 14px 14px auto 14px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .pill{
+      pointer-events: none;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: rgba(255,255,255,0.9);
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      backdrop-filter: blur(6px);
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .dot{
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px rgba(98,246,196,0.15);
+      flex: 0 0 auto;
+    }
+
+    .content{
+      padding: clamp(12px, 2vw, 14px) clamp(12px, 2vw, 14px) clamp(14px, 2vw, 16px);
+      display: flex;
+      flex-direction: column;
+      gap: 12px; /* Espaciado uniforme entre secciones */
+    }
+
+    .section{
+      padding: 12px 12px;
+      margin: 0; /* El espacio lo gestiona .content con gap */
+      background: var(--panel-2);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+    }
+
+    .section h2{
+      margin: 0 0 10px;
+      font-size: 14px;
+      color: rgba(255,255,255,0.93);
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .section h2 .tag{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.88);
+    }
+
+    .list{
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 13.5px;
+    }
+
+    .kvs{
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 6px 10px;
+      font-size: 13.5px;
+    }
+    @media (max-width: 500px){
+      .kvs{ grid-template-columns: 1fr; }
+    }
+
+    .kv{
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .kvv{
+      color: rgba(255,255,255,0.92);
+    }
+
+    table{
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+    th, td{
+      padding: 10px 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      font-size: 13px;
+      vertical-align: top;
+    }
+    th{
+      text-align: left;
+      color: rgba(255,255,255,0.92);
+      background: rgba(255,255,255,0.06);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    td{
+      color: var(--muted);
+    }
+    .tableWrap{
+      max-height: clamp(180px, 30vh, 320px);
+      overflow: auto;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+    }
+
+    .note{
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13.5px;
+    }
+
+    .stars{
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: rgba(255,255,255,0.95);
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    .footer{
+      color: var(--muted);
+      font-size: 12.5px;
+      margin-top: 0;
+    }
+
+    a{ color: var(--accent-2); }
+    .smallcaps{ text-transform: uppercase; letter-spacing: 0.05em; font-size: 11px; color: rgba(255,255,255,0.65); }
+
+    /* Ajustes para pantallas muy pequeñas */
+    @media (max-width: 430px){
+      .canvasHUD{
+        inset: 10px 10px auto 10px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .pill{
+        font-size: 11px;
+        padding: 7px 9px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="title">
+        <h1>Ficha Técnica: Game Boy Color (GBC)</h1>
+      </div>
+      <div class="smallcaps">HTML + Three.js (modelo procedural)</div>
+    </div>
+
+    <div class="layout">
+      <div class="card canvasCard">
+        <div class="canvasHUD">
+          <div class="pill"><span class="dot"></span> Vista 3D</div>
+          <div class="pill">Rota sutil (se puede detener)</div>
+        </div>
+        <canvas id="gb-canvas" aria-label="Modelo 3D del Game Boy Color"></canvas>
+      </div>
+
+      <div class="card">
+        <div class="content">
+          <div class="section">
+            <h2>1) Identificación del “cerebro”</h2>
+            <div class="kvs" role="table" aria-label="Especificaciones de CPU">
+              <div class="kv">Dispositivo:</div><div class="kvv">Game Boy Color (GBC)</div>
+              <div class="kv">Modelo de procesador:</div><div class="kvv">Sharp LR35902 (CPU híbrida basada en Intel 8080 y Zilog Z80)</div>
+              <div class="kv">Frecuencia:</div><div class="kvv">~8.388 MHz (doble velocidad respecto al Game Boy original)</div>
+              <div class="kv">Arquitectura:</div><div class="kvv">8 bits</div>
+              <div class="kv">Filosofía de instrucciones:</div><div class="kvv">CISC (Complex Instruction Set Computer)</div>
+            </div>
+            <div class="note">
+              <strong>Justificación:</strong>
+              <ul class="list">
+                <li>Tiene un conjunto amplio de instrucciones, incluyendo operaciones complejas.</li>
+                <li>Permite instrucciones de diferentes tamaños y ciclos de ejecución variables.</li>
+                <li>Integra características heredadas de procesadores como el Z80, típicamente CISC.</li>
+                <li>Incluye instrucciones que realizan múltiples operaciones en un solo ciclo (ej. manipulación directa de memoria).</li>
+                <li>Aunque es simplificado comparado con CPUs de escritorio, no cumple con la filosofía RISC.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="section">
+            <h2>2) Mapa de Memoria</h2>
+            <div class="note" style="margin-top:0;">
+              El Game Boy Color utiliza un espacio de direcciones de <strong>16 bits</strong>, lo que permite acceder hasta <strong>64 KB</strong> de memoria.
+            </div>
+            <div class="tableWrap" style="margin-top:10px;">
+              <table aria-label="Mapa de memoria del Game Boy Color">
+                <thead>
+                  <tr>
+                    <th style="min-width: 160px;">Dirección</th>
+                    <th style="min-width: 120px;">Tamaño</th>
+                    <th>Descripción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>0000–3FFF</td><td>16 KB</td><td>ROM del cartucho (banco fijo)</td></tr>
+                  <tr><td>4000–7FFF</td><td>16 KB</td><td>ROM con banco intercambiable</td></tr>
+                  <tr><td>8000–9FFF</td><td>8 KB</td><td>VRAM (memoria de video)</td></tr>
+                  <tr><td>A000–BFFF</td><td>8 KB</td><td>RAM externa (cartucho)</td></tr>
+                  <tr><td>C000–CFFF</td><td>4 KB</td><td>RAM interna</td></tr>
+                  <tr><td>D000–DFFF</td><td>4 KB</td><td>RAM interna con banco intercambiable</td></tr>
+                  <tr><td>E000–FDFF</td><td>7.5 KB</td><td>Eco de RAM (mirror)</td></tr>
+                  <tr><td>FE00–FE9F</td><td>160 bytes</td><td>OAM (atributos de sprites)</td></tr>
+                  <tr><td>FEA0–FEFF</td><td>—</td><td>Área no usable</td></tr>
+                  <tr><td>FF00–FF7F</td><td>128 bytes</td><td>Registros de I/O</td></tr>
+                  <tr><td>FF80–FFFE</td><td>127 bytes</td><td>HRAM (RAM de alta velocidad)</td></tr>
+                  <tr><td>FFFF</td><td>1 byte</td><td>Registro de interrupciones</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="note">
+              <strong>Notas importantes:</strong>
+              <ul class="list">
+                <li>La VRAM permite trabajar con gráficos en color (hasta 56 colores simultáneos).</li>
+                <li>La memoria es limitada, por lo que se usan técnicas como bank switching.</li>
+                <li>El GBC mejora la RAM respecto al Game Boy original (~32 KB total interna).</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="section">
+            <h2>3) Análisis de eficiencia</h2>
+            <div class="note" style="margin-top:0;">
+              <strong>Fortalezas</strong>
+              <ul class="list">
+                <li>Bajo consumo energético: diseñado para funcionar con baterías, optimiza cada ciclo de CPU.</li>
+                <li>Arquitectura simple pero efectiva: permite ejecución rápida sin hardware complejo.</li>
+                <li>Uso de bank switching: permite superar la limitación de 64 KB direccionables.</li>
+                <li>Integración CPU + GPU básica: reduce overhead y mejora eficiencia en gráficos 2D.</li>
+                <li>Optimización para juegos: el hardware está especializado para tareas específicas.</li>
+              </ul>
+            </div>
+
+            <div class="note">
+              <strong>Limitaciones</strong>
+              <ul class="list">
+                <li>Velocidad limitada: 8 MHz es bajo comparado con consolas de sobremesa.</li>
+                <li>Memoria restringida: dependencia de cartuchos con memoria adicional.</li>
+                <li>Sin multitarea real: solo ejecuta un proceso principal (foreground).</li>
+                <li>Sin pipeline avanzado ni paralelismo: muy básico frente a arquitecturas modernas.</li>
+              </ul>
+            </div>
+
+            <div class="note">
+              <strong>Evaluación general de eficiencia</strong>
+              <div class="tableWrap" style="margin-top:10px;">
+                <table aria-label="Evaluación general de eficiencia">
+                  <thead>
+                    <tr>
+                      <th style="min-width: 170px;">Factor</th>
+                      <th style="min-width: 160px;">Evaluación</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>Consumo energético</td><td class="stars">5/5</td></tr>
+                    <tr><td>Rendimiento bruto</td><td class="stars">2/5</td></tr>
+                    <tr><td>Optimización HW/SW</td><td class="stars">4/5</td></tr>
+                    <tr><td>Escalabilidad</td><td class="stars">2/5</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="note">
+              <strong>Conclusión:</strong>
+              El Game Boy Color es altamente eficiente para su propósito: ejecutar videojuegos portátiles con bajo consumo. Su arquitectura CISC simplificada permite flexibilidad, pero sacrifica rendimiento y escalabilidad frente a sistemas modernos.
+            </div>
+          </div>
+
+          <div class="section">
+            <h2>Conclusión general</h2>
+            <div class="note" style="margin-top:0;">
+              El Game Boy Color representa un diseño equilibrado entre limitaciones físicas (batería, tamaño) y capacidad de procesamiento, donde su CPU CISC simplificada y su manejo eficiente de memoria le permiten ofrecer una experiencia sólida dentro de un hardware muy restringido.
+            </div>
+          </div>
+
+          <div class="footer">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+  <script>
+    (function(){
+      const canvas = document.getElementById('gb-canvas');
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+      renderer.setClearColor(0x000000, 0);
+
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.Fog(0x0b1220, 10, 30);
+
+      const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+      camera.position.set(0, 1.2, 5.2);
+      camera.lookAt(0, 0, 0);
+
+      // Luz suave + reflejos básicos.
+      const ambient = new THREE.AmbientLight(0xffffff, 0.75);
+      scene.add(ambient);
+      const dir = new THREE.DirectionalLight(0x7aa7ff, 0.8);
+      dir.position.set(3, 4, 2);
+      scene.add(dir);
+
+      const back = new THREE.Mesh(
+        new THREE.PlaneGeometry(18, 12),
+        new THREE.MeshBasicMaterial({ color: 0x0b1220, opacity: 0.0, transparent: true })
+      );
+      back.position.z = -6;
+      scene.add(back);
+
+      function roundedBox(w, h, d, r){
+        // Aproximación simple: BoxGeometry + pequeñas aristas via segmentos (sin SDF).
+        const geo = new THREE.BoxGeometry(w, h, d, 2, 2, 2);
+        return geo;
+      }
+
+      // Modelo procedural (no depende de assets externos).
+      function buildGameBoy(){
+        const group = new THREE.Group();
+
+        // Color base (una variación típica para GBC, ajustable).
+        const bodyMat = new THREE.MeshStandardMaterial({
+          color: 0x3dbf9d,
+          metalness: 0.08,
+          roughness: 0.65
+        });
+
+        const accentMat = new THREE.MeshStandardMaterial({
+          color: 0x1c2a3f,
+          metalness: 0.05,
+          roughness: 0.9
+        });
+
+        // Cuerpo principal.
+        const body = new THREE.Mesh(roundedBox(2.9, 1.55, 0.28), bodyMat);
+        body.position.set(0, 0, 0);
+        group.add(body);
+
+        // Pantalla (marco + “display”).
+        const screenFrameMat = new THREE.MeshStandardMaterial({
+          color: 0x2a3648,
+          metalness: 0.05,
+          roughness: 0.85
+        });
+        const screenOuter = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.75, 0.05), screenFrameMat);
+        screenOuter.position.set(0, 0.22, 0.14);
+        group.add(screenOuter);
+
+        const screenGlassMat = new THREE.MeshStandardMaterial({
+          color: 0x20ffb8,
+          emissive: 0x0fa96f,
+          emissiveIntensity: 0.35,
+          roughness: 0.35,
+          metalness: 0.02,
+          transparent: true,
+          opacity: 0.98
+        });
+        const screen = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.68, 0.02), screenGlassMat);
+        screen.position.set(0, 0.22, 0.155);
+        group.add(screen);
+
+        // Detalle inferior.
+        const bottom = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.15, 0.28), accentMat);
+        bottom.position.set(0, -0.73, 0);
+        group.add(bottom);
+
+        // Botones (lado izquierdo y derecho).
+        const btnMat = new THREE.MeshStandardMaterial({
+          color: 0x132033,
+          metalness: 0.05,
+          roughness: 0.75
+        });
+
+        const btnPositions = [
+          [-0.95, -0.15, 0.16],
+          [-0.73, -0.15, 0.16],
+          [-0.50, -0.15, 0.16],
+          [ 0.50, -0.15, 0.16],
+          [ 0.73, -0.15, 0.16],
+          [ 0.95, -0.15, 0.16],
+        ];
+        for(const p of btnPositions){
+          const b = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 0.08, 18), btnMat);
+          b.position.set(p[0], p[1], p[2]);
+          group.add(b);
+        }
+
+        // Botón circular central (estilo “power/menu” abstracto).
+        const centerBtn = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.1, 0.12, 0.06, 22),
+          new THREE.MeshStandardMaterial({ color: 0x16304a, roughness: 0.75 })
+        );
+        centerBtn.position.set(0.0, -0.48, 0.16);
+        group.add(centerBtn);
+
+        // “Stick” visual: un par de placas para simular direccional.
+        const stick = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.12, 0.05), btnMat);
+        stick.position.set(-0.95, 0.02, 0.16);
+        group.add(stick);
+
+        // Inclinación inicial.
+        group.rotation.x = -0.08;
+        return group;
+      }
+
+      const gb = buildGameBoy();
+      scene.add(gb);
+
+      // Centrar el modelo y ajustar la cámara para que no se recorte.
+      const modelBox = new THREE.Box3().setFromObject(gb);
+      const modelSize = modelBox.getSize(new THREE.Vector3());
+      const modelCenter = modelBox.getCenter(new THREE.Vector3());
+      gb.position.sub(modelCenter);
+
+      const baseY = gb.position.y;
+      const maxDim = Math.max(modelSize.x, modelSize.y, modelSize.z);
+      const fovRad = THREE.MathUtils.degToRad(camera.fov);
+      let cameraZ = (maxDim / 2) / Math.tan(fovRad / 2);
+      cameraZ *= 1.35; // margen extra para que quede aire alrededor
+
+      camera.position.set(0, Math.max(0.6, modelSize.y * 0.12), cameraZ);
+      camera.lookAt(0, 0, 0);
+
+      // Interacción: click/tap alterna rotación.
+      let rotating = true;
+      function toggleRotation(){
+        rotating = !rotating;
+      }
+      canvas.addEventListener('click', toggleRotation);
+
+      // Añadir un “halo” de luz alrededor.
+      const glow = new THREE.Mesh(
+        new THREE.SphereGeometry(2.0, 32, 32),
+        new THREE.MeshBasicMaterial({ color: 0x62f6c4, transparent: true, opacity: 0.07 })
+      );
+      glow.position.set(0, 0.1, -0.4);
+      scene.add(glow);
+
+      function resize(){
+        const rect = canvas.getBoundingClientRect();
+        const w = Math.max(1, rect.width);
+        const h = Math.max(1, rect.height);
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      // Animación / render loop.
+      const clock = new THREE.Clock();
+      function tick(){
+        const t = clock.getElapsedTime();
+        if(rotating){
+          gb.rotation.y = Math.sin(t * 0.6) * 0.35 + t * 0.06;
+          gb.rotation.z = Math.sin(t * 0.4) * 0.03;
+        }
+        // Pequeña bobbing para sensación 3D.
+        gb.position.y = baseY + Math.sin(t * 1.2) * 0.02;
+        renderer.render(scene, camera);
+        requestAnimationFrame(tick);
+      }
+
+      const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if(reduceMotion) rotating = false;
+
+      tick();
+    })();
+  </script>
+</body>
+</html>
+
