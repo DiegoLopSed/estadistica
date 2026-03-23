@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistemas Embebidos — Componentes Clave</title>
+  <style>
+    :root {
+      --bg: #0c1222;
+      --bg-slide: #121a2e;
+      --text: #e8ecf4;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-dim: rgba(56, 189, 248, 0.15);
+      --border: rgba(148, 163, 184, 0.2);
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+      --slide-dur: 0.55s;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .app {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .deck-wrap {
+      flex: 1;
+      min-height: 0;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: stretch;
+      padding: 0.5rem clamp(0.75rem, 2.5vw, 2.5rem) 0.65rem;
+    }
+
+    .deck {
+      width: min(100%, 88rem);
+      max-width: min(98vw, 92rem);
+      flex: 1;
+      min-height: 0;
+      height: 100%;
+      position: relative;
+      border-radius: 1rem;
+      border: 1px solid var(--border);
+      background: var(--bg-slide);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: clamp(1.5rem, 3.5vw, 3.5rem) clamp(1.5rem, 4vw, 3.75rem);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 1.1rem;
+      overflow-y: auto;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      z-index: 0;
+      transform: scale(0.97) translateY(12px);
+      filter: brightness(0.92);
+      transition:
+        opacity var(--slide-dur) var(--ease-out),
+        transform var(--slide-dur) var(--ease-out),
+        filter var(--slide-dur) var(--ease-out),
+        visibility 0s linear var(--slide-dur);
+      scrollbar-width: thin;
+      scrollbar-color: rgba(56, 189, 248, 0.35) transparent;
+    }
+
+    .slide::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .slide::-webkit-scrollbar-thumb {
+      background: rgba(56, 189, 248, 0.3);
+      border-radius: 4px;
+    }
+
+    .slide::-webkit-scrollbar-thumb:hover {
+      background: rgba(56, 189, 248, 0.5);
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      z-index: 2;
+      transform: scale(1) translateY(0);
+      filter: brightness(1);
+      transition-delay: 0s, 0s, 0s, 0s;
+    }
+
+    @keyframes slideContentIn {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .slide.active > h1,
+    .slide.active > h2,
+    .slide.active > p:not(.slide-num),
+    .slide.active > ul,
+    .slide.active > ol,
+    .slide.active > .table-wrap,
+    .slide.active > .refs {
+      animation: slideContentIn 0.6s var(--ease-out) backwards;
+    }
+
+    .slide.active > h1 {
+      animation-delay: 0.06s;
+    }
+
+    .slide.active > h2 {
+      animation-delay: 0.1s;
+    }
+
+    .slide.active > p.subtitle {
+      animation-delay: 0.16s;
+    }
+
+    .slide.active > p:not(.subtitle):not(.slide-num) {
+      animation-delay: 0.12s;
+    }
+
+    .slide.active > ul,
+    .slide.active > ol {
+      animation-delay: 0.14s;
+    }
+
+    .slide.active > .table-wrap {
+      animation-delay: 0.12s;
+    }
+
+    .slide.active > .refs {
+      animation-delay: 0.1s;
+    }
+
+    .slide.active > figure.media-placeholder {
+      animation: slideContentIn 0.6s var(--ease-out) 0.12s backwards;
+    }
+
+    .slide.active > p.qa {
+      animation-delay: 0.12s;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      :root {
+        --slide-dur: 0.12s;
+      }
+
+      .slide {
+        transform: none;
+        filter: none;
+        transition: opacity var(--slide-dur) ease, visibility 0s linear var(--slide-dur);
+      }
+
+      .slide.active {
+        transform: none;
+        filter: none;
+      }
+
+      .slide.active > h1,
+      .slide.active > h2,
+      .slide.active > p:not(.slide-num),
+      .slide.active > ul,
+      .slide.active > ol,
+      .slide.active > .table-wrap,
+      .slide.active > .refs,
+      .slide.active > figure.media-placeholder {
+        animation: none !important;
+      }
+    }
+
+    .slide-num {
+      position: absolute;
+      top: 1rem;
+      right: 1.25rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    .slide h1 {
+      font-size: clamp(1.6rem, 4.2vw, 2.65rem);
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--text);
+    }
+
+    .slide h2 {
+      font-size: clamp(1.2rem, 2.6vw, 1.7rem);
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 0.35rem;
+    }
+
+    .slide .subtitle {
+      font-size: clamp(1.05rem, 2.1vw, 1.3rem);
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .slide ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .slide li {
+      padding-left: 1.25rem;
+      position: relative;
+      line-height: 1.5;
+      font-size: clamp(0.95rem, 1.9vw, 1.12rem);
+    }
+
+    .slide li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.55em;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .slide li strong {
+      color: var(--text);
+    }
+
+    .slide ol.numbered {
+      list-style: none;
+    }
+
+    .slide .numbered {
+      counter-reset: item;
+    }
+
+    .slide .numbered li {
+      counter-increment: item;
+      padding-left: 2rem;
+    }
+
+    .slide .numbered li::before {
+      content: counter(item) ".";
+      width: auto;
+      height: auto;
+      border-radius: 0;
+      background: none;
+      color: var(--accent);
+      font-weight: 600;
+      top: 0;
+    }
+
+    .slide .nested {
+      margin-top: 0.5rem;
+      margin-left: 0.5rem;
+      gap: 0.4rem;
+    }
+
+    .slide .nested li::before {
+      width: 4px;
+      height: 4px;
+      top: 0.65em;
+      opacity: 0.7;
+    }
+
+    .cover {
+      text-align: center;
+      justify-content: center;
+    }
+
+    .cover h1 {
+      max-width: min(42ch, 95%);
+      margin: 0 auto;
+    }
+
+    .cover .subtitle {
+      margin-top: 1rem;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 0.5rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: clamp(0.8rem, 1.6vw, 0.98rem);
+    }
+
+    th, td {
+      padding: 0.6rem 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: var(--accent-dim);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .refs {
+      font-size: clamp(0.8rem, 1.5vw, 0.95rem);
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    .refs p {
+      margin-bottom: 0.85rem;
+    }
+
+    .refs em {
+      color: var(--text);
+      font-style: italic;
+    }
+
+    .qa {
+      text-align: center;
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .media-placeholder {
+      margin: 0;
+      width: 100%;
+      max-width: 100%;
+      border-radius: 0.65rem;
+      overflow: hidden;
+    }
+
+    .media-placeholder-frame {
+      position: relative;
+      min-height: clamp(6.5rem, 18vh, 11rem);
+      border: 1px dashed rgba(148, 163, 184, 0.4);
+      border-radius: 0.65rem;
+      background: linear-gradient(
+        160deg,
+        rgba(56, 189, 248, 0.08) 0%,
+        rgba(15, 23, 42, 0.45) 50%,
+        rgba(56, 189, 248, 0.05) 100%
+      );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .media-placeholder--hero .media-placeholder-frame {
+      min-height: clamp(9rem, 26vh, 16rem);
+    }
+
+    .media-placeholder--sm .media-placeholder-frame {
+      min-height: clamp(4rem, 11vh, 7rem);
+    }
+
+    .media-placeholder--qa .media-placeholder-frame {
+      min-height: clamp(11rem, 30vh, 20rem);
+    }
+
+    .media-placeholder-fallback {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 1rem 1.25rem;
+      text-align: center;
+    }
+
+    .media-placeholder-icon {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      line-height: 1;
+      opacity: 0.45;
+      color: var(--accent);
+    }
+
+    .media-placeholder-title {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--accent);
+    }
+
+    .media-placeholder:has(img) .media-placeholder-fallback {
+      display: none;
+    }
+
+    /* Con imagen: el marco se ajusta al aspecto real (sin bandas laterales) y escala solo hasta caber en la diapositiva */
+    .media-placeholder:has(img) {
+      width: fit-content;
+      max-width: 100%;
+      margin-inline: auto;
+      align-self: center;
+    }
+
+    .media-placeholder:has(img) .media-placeholder-frame {
+      border-style: solid;
+      border-color: var(--border);
+      background: rgba(0, 0, 0, 0.2);
+      min-height: 0;
+      width: fit-content;
+      max-width: 100%;
+    }
+
+    .media-placeholder img.slide-media {
+      display: block;
+      width: auto;
+      max-width: 100%;
+      height: auto;
+      max-height: min(42vh, 22rem);
+      object-fit: contain;
+      object-position: center;
+      margin: 0 auto;
+      image-rendering: auto;
+    }
+
+    .media-placeholder--hero:has(img) img.slide-media {
+      max-height: min(52vh, 34rem);
+    }
+
+    .media-placeholder--sm:has(img) img.slide-media {
+      max-height: min(32vh, 16rem);
+    }
+
+    .media-placeholder--qa:has(img) img.slide-media {
+      max-height: min(58vh, 40rem);
+    }
+
+    .bar {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.5rem clamp(1rem, 3vw, 2rem);
+      border-top: 1px solid var(--border);
+      background: rgba(12, 18, 34, 0.95);
+    }
+
+    .bar button {
+      font: inherit;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--bg-slide);
+      color: var(--text);
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .bar button:hover:not(:disabled) {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    .bar button:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: center;
+      flex: 1;
+    }
+
+    .dots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      justify-content: center;
+      max-width: min(100%, 28rem);
+    }
+
+    .dots button {
+      width: 8px;
+      height: 8px;
+      padding: 0;
+      border-radius: 50%;
+      border: none;
+      background: var(--border);
+      cursor: pointer;
+      transition: transform 0.15s, background 0.15s;
+    }
+
+    .dots button:hover {
+      background: var(--muted);
+    }
+
+    .dots button.active {
+      background: var(--accent);
+      transform: scale(1.2);
+    }
+
+    @media (max-width: 640px) {
+      .hint {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="deck-wrap">
+      <div class="deck" id="deck" role="region" aria-label="Diapositivas de la presentación">
+        <!--
+          Imágenes: en cada figure.media-placeholder usa los atributos data-image-url y data-image-alt
+          en la etiqueta figure. URL obligatoria para mostrar la foto; alt recomendado. URL vacía = placeholder.
+        -->
+        <!-- 1 Portada -->
+        <section class="slide cover active" data-slide="1" aria-hidden="false">
+          <span class="slide-num">1 / 26</span>
+          <h1>Sistemas Embebidos: Componentes Clave para la Interacción con el Entorno</h1>
+          <p class="subtitle">Puertos, Temporizadores e Interfaces de Comunicación</p>
+          <figure
+            class="media-placeholder media-placeholder--hero"
+            data-image-url="https://digiproces.com/wp-content/uploads/2025/02/embedded-systems_DigiProces.jpg"
+            data-image-alt="Ilustración de sistemas embebidos: integración de hardware y software"
+            data-image-priority="high"
+          >
+            <div class="media-placeholder-frame">
+              <div class="media-placeholder-fallback" aria-hidden="true">
+                <span class="media-placeholder-icon">▢</span>
+                <span class="media-placeholder-title">Imagen</span>
+              </div>
+            </div>
+          </figure>
+        </section>
+
+        <!-- 2 -->
+        <section class="slide" data-slide="2" aria-hidden="true">
+          <span class="slide-num">2 / 26</span>
+          <h2>Introducción a los Sistemas Embebidos</h2>
+          <figure class="media-placeholder" data-image-url="https://es.digi.com/getattachment/Blog/post/Examples-of-Embedded-Systems/GettyImages-966859036-1280x720.jpg?lang=en-US" data-image-alt="">
+            <div class="media-placeholder-frame">
+              <div class="media-placeholder-fallback" aria-hidden="true">
+                <span class="media-placeholder-icon">▢</span>
+                <span class="media-placeholder-title">Imagen</span>
+              </div>
+            </div>
+            
+          </figure>
+          <ul>
+            <li><strong>Definición:</strong> Integración de hardware y software para funciones específicas</li>
+            <li><strong>Importancia:</strong> Presentes en dispositivos médicos, automóviles, electrodomésticos, control industrial</li>
+            <li><strong>Objetivo de la presentación:</strong> Analizar cuatro componentes fundamentales</li>
+          </ul>
+        </section>
+
+        <!-- 3 -->
+        <section class="slide" data-slide="3" aria-hidden="true">
+          <span class="slide-num">3 / 26</span>
+          <h2>Los Cuatro Componentes Clave</h2>
+          <figure class="media-placeholder" data-image-url="https://aprendiendoarduino.wordpress.com/wp-content/uploads/2017/06/15121-arduinouno-descripciondepines_thumb255b2255d.jpg" data-image-alt="">
+            <div class="media-placeholder-frame">
+              <div class="media-placeholder-fallback" aria-hidden="true">
+                <span class="media-placeholder-icon">▢</span>
+                <span class="media-placeholder-title">Imagen</span>
+              </div>
+            </div>
+            
+          </figure>
+          <ol class="numbered">
+            <li>Puertos Digitales de Entrada y Salida</li>
+            <li>Puertos Analógicos de Entrada y Salida</li>
+            <li>Temporizadores</li>
+            <li>Interfaces de Comunicación</li>
+          </ol>
+        </section>
+
+        <!-- 4 -->
+        <section class="slide" data-slide="4" aria-hidden="true">
+          <span class="slide-num">4 / 26</span>
+          <h2>Puertos Digitales — Conceptos Básicos</h2>
+          <figure class="media-placeholder" data-image-url="https://panamahitek.com/wp-content/uploads/2015/12/entradas-y-salids-analogicas-y-digitales.png" data-image-alt="">
+            <div class="media-placeholder-frame">
+              <div class="media-placeholder-fallback" aria-hidden="true">
+                <span class="media-placeholder-icon">▢</span>
+                <span class="media-placeholder-title">Imagen</span>
+              </div>
+            </div>
+            
+          </figure>
+          <ul>
+            <li><strong>Función:</strong> Interactuar con el mundo exterior mediante señales binarias (0 y 1)</li>
+            <li><strong>Configuración:</strong> Entrada o salida según necesidad</li>
+            <li><strong>Niveles lógicos:</strong> 0V (bajo) y Vcc (alto, típicamente 3.3V o 5V)</li>
+          </ul>
+        </section>
+
+        <!-- 5 -->
+        <section class="slide" data-slide="5" aria-hidden="true">
+          <span class="slide-num">5 / 26</span>
+          <h2>Puertos Digitales — Características</h2>
+          <figure class="media-placeholder" data-image-url="https://controlautomaticoeducacion.com/wp-content/uploads/Pines-Digitales-de-Arduino.png" data-image-alt="">
+            <div class="media-placeholder-frame">
+              <div class="media-placeholder-fallback" aria-hidden="true">
+                <span class="media-placeholder-icon">▢</span>
+                <span class="media-placeholder-title">Imagen</span>
+              </div>
+            </div>
+            
+          </figure>
+          <ul>
+            <li><strong>Agrupación en puertos:</strong> 8, 16 o 32 bits</li>
+            <li><strong>Control individual:</strong> Cada pin configurable independientemente</li>
+            <li><strong>Pull-up/Pull-down:</strong> Resistencias internas para estados estables</li>
+            <li><strong>Limitación de corriente:</strong> 20-40 mA por pin típicamente</li>
+            <li><strong>Interrupciones:</strong> Respuesta rápida a eventos externos</li>
+          </ul>
+        </section>
+
+        <!-- 6 -->
+        <section class="slide" data-slide="6" aria-hidden="true">
+          <span class="slide-num">6 / 26</span>
+          <h2>Puertos Digitales — Aplicaciones</h2>
+          <figure class="media-placeholder" data-image-url="data:image/png;base64,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" data-image-alt="">
+            <div class="media-placeholder-frame">
+              <div class="media-placeholder-fallback" aria-hidden="true">
+                <span class="media-placeholder-icon">▢</span>
+                <span class="media-placeholder-title">Imagen</span>
+              </div>
+            </div>
+            
+          </figure>
+          <ul>
+            <li>Control de LEDs y displays de 7 segmentos</li>
+            <li>Lectura de botones y switches</li>
+            <li>Activación de relés</li>
+            <li>Control de motores paso a paso</li>
+            <li>Monitoreo de eventos discretos</li>
+          </ul>
+        </section>
+
+        <!-- 7 -->
+        <section class="slide" data-slide="7" aria-hidden="true">
+          <span class="slide-num">7 / 26</span>
+          <h2>Puertos Analógicos — Conversión ADC</h2>
+          <figure class="media-placeholder" data-image-url="https://intesc.mx/wp-content/uploads/2021/05/3-ADC.gif" data-image-alt="">
+            <div class="media-placeholder-frame">
+              <div class="media-placeholder-fallback" aria-hidden="true">
+                <span class="media-placeholder-icon">▢</span>
+                <span class="media-placeholder-title">Imagen</span>
+              </div>
+            </div>
+            
+          </figure>
+          <ul>
+            <li><strong>Función:</strong> Transformar señales continuas en valores digitales</li>
+            <li><strong>Resolución:</strong> 10, 12 o 16 bits (determina precisión)</li>
+            <li><strong>Velocidad de muestreo:</strong> Conversiones por segundo</li>
+            <li><strong>Rango de voltaje:</strong> Normalmente 0V a Vcc</li>
+            <li><strong>Referencias:</strong> Internas o externas para mayor precisión</li>
+          </ul>
+        </section>
+
+        <!-- 8 -->
+        <section class="slide" data-slide="8" aria-hidden="true">
+          <span class="slide-num">8 / 26</span>
+          <h2>Puertos Analógicos — DAC y PWM</h2>
+          <figure class="media-placeholder" data-image-url="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgdUh6f4mLVM2WVs9023joA6d91lYueLMjg7Ye8dYDbyCqEyFhSKA-S94zlMRWmvtvFp2D_lUEOYid2NMqRT-DlzPEDwjqaOPRkov-ydPYhTQd_lplJL3Os-Kjc8vFFycGSc7EXLNow/s1600/IMGP4376red.jpg" data-image-alt="">
+            <div class="media-placeholder-frame">
+              <div class="media-placeholder-fallback" aria-hidden="true">
+                <span class="media-placeholder-icon">▢</span>
+                <span class="media-placeholder-title">Imagen</span>
+              </div>
+            </div>
+           
+          </figure>
+          <ul>
+            <li><strong>DAC:</strong> Genera voltajes variables desde valores digitales</li>
+            <li><strong>PWM (alternativa):</strong> Modulación por ancho de pulso para simular salidas analógicas</li>
+            <li><strong>Aplicación PWM:</strong> Control de velocidad de motores, atenuación de LEDs</li>
+          </ul>
+        </section>
+
+        <!-- 9 -->
+        <section class="slide" data-slide="9" aria-hidden="true">
+          <span class="slide-num">9 / 26</span>
+          <h2>Puertos Analógicos — Aplicaciones</h2>
+          <figure class="media-placeholder" data-image-url="https://i.ytimg.com/vi/T4BZKWD2XnU/maxresdefault.jpg" data-image-alt="">
+            <div class="media-placeholder-frame">
+              <div class="media-placeholder-fallback" aria-hidden="true">
+                <span class="media-placeholder-icon">▢</span>
+                <span class="media-placeholder-title">Imagen</span>
+              </div>
+            </div>
+            
+          </figure>
+          <ul>
+            <li>Lectura de sensores: temperatura, humedad, luz, presión</li>
+            <li>Acelerómetros y giróscopos</li>
+            <li>Control de servomotores</li>
+            <li>Atenuación de LEDs</li>
+            <li>Generación de señales de audio</li>
+          </ul>
+        </section>
+
+        <!-- 10 -->
+        <section class="slide" data-slide="10" aria-hidden="true">
+          <span class="slide-num">10 / 26</span>
+          <h2>Temporizadores — Conceptos</h2>
+          <figure class="media-placeholder" data-image-url="https://controlautomaticoeducacion.com/wp-content/uploads/timers_Arduino.jpg" data-image-alt="">
+            <div class="media-placeholder-frame">
+              <div class="media-placeholder-fallback" aria-hidden="true">
+                <span class="media-placeholder-icon">▢</span>
+                <span class="media-placeholder-title">Imagen</span>
+              </div>
+            </div>
+            
+          </figure>
+          <ul>
+            <li><strong>Definición:</strong> Módulos de hardware especializados que operan independientemente del procesador</li>
+            <li><strong>Función principal:</strong> Mediciones precisas de tiempo y generación de eventos temporales</li>
+            <li><strong>Ventaja:</strong> No consumen recursos del procesador principal</li>
+          </ul>
+        </section>
+
+        <!-- 11 -->
+        <section class="slide" data-slide="11" aria-hidden="true">
+          <span class="slide-num">11 / 26</span>
+          <h2>Temporizadores — Tipos</h2>
+          <figure class="media-placeholder" data-image-url="https://m.media-amazon.com/images/I/61+pxQBxXWL._AC_UF350,350_QL50_.jpg" data-image-alt="">
+            <div class="media-placeholder-frame">
+              <div class="media-placeholder-fallback" aria-hidden="true">
+                <span class="media-placeholder-icon">▢</span>
+                <span class="media-placeholder-title">Imagen</span>
+              </div>
+            </div>
+            
+          </figure>
+          <ul>
+            <li><strong>Básicos:</strong> Contadores que incrementan con cada pulso de reloj</li>
+            <li><strong>De captura:</strong> Registran valor del contador al detectar evento externo</li>
+            <li><strong>De comparación:</strong> Generan eventos cuando el contador alcanza un valor predeterminado</li>
+            <li><strong>Watchdog:</strong> Resetean el sistema si no son reiniciados (previenen bloqueos)</li>
+          </ul>
+        </section>
+
+        <!-- 12 -->
+        <section class="slide" data-slide="12" aria-hidden="true">
+          <span class="slide-num">12 / 26</span>
+          <h2>Temporizadores — Características</h2>
+          <figure class="media-placeholder" data-image-url="https://letopv.com/wp-content/uploads/2025/03/Type-of-timer-switches-from-LETOP.webp" data-image-alt="">
+            <div class="media-placeholder-frame">
+              <div class="media-placeholder-fallback" aria-hidden="true">
+                <span class="media-placeholder-icon">▢</span>
+                <span class="media-placeholder-title">Imagen</span>
+              </div>
+            </div>
+            
+          </figure>
+          <ul>
+            <li>Múltiples modos de operación</li>
+            <li>Prescalers para dividir frecuencia de reloj</li>
+            <li>Capacidad de generar interrupciones</li>
+            <li>Operación en modos de bajo consumo</li>
+            <li>Precisión dependiente de la frecuencia del reloj del sistema</li>
+          </ul>
+        </section>
+
+        <!-- 13 -->
+        <section class="slide" data-slide="13" aria-hidden="true">
+          <span class="slide-num">13 / 26</span>
+          <h2>Temporizadores — Aplicaciones</h2>
+          <figure class="media-placeholder" data-image-url="https://www.letopv.com/wp-content/uploads/2024/12/Timer-switch-applications.webp" data-image-alt="">
+            <div class="media-placeholder-frame">
+              <div class="media-placeholder-fallback" aria-hidden="true">
+                <span class="media-placeholder-icon">▢</span>
+                <span class="media-placeholder-title">Imagen</span>
+              </div>
+            </div>
+           
+          </figure>
+          <ul>
+            <li>Generación de señales PWM para control de motores</li>
+            <li>Medición de frecuencias y períodos</li>
+            <li>Base de tiempo para sistemas operativos en tiempo real</li>
+            <li>Generación de retardos precisos</li>
+            <li>Decodificación de protocolos de comunicación</li>
+          </ul>
+        </section>
+
+        <!-- 14 -->
+        <section class="slide" data-slide="14" aria-hidden="true">
+          <span class="slide-num">14 / 26</span>
+          <h2>Interfaces de Comunicación — Introducción</h2>
+          <figure class="media-placeholder" data-image-url="https://www.ecured.cu/images/8/87/Transm_de_datos.jpg" data-image-alt="">
+            <div class="media-placeholder-frame">
+              <div class="media-placeholder-fallback" aria-hidden="true">
+                <span class="media-placeholder-icon">▢</span>
+                <span class="media-placeholder-title">Imagen</span>
+              </div>
+            </div>
+            
+          </figure>
+          <ul>
+            <li><strong>Propósito:</strong> Intercambio de datos entre sistemas embebidos y otros dispositivos</li>
+            <li><strong>Tipos:</strong> UART, SPI, I²C, CAN, USB, Ethernet, Wi-Fi</li>
+            <li><strong>Criterios de selección:</strong> Velocidad, distancia, número de dispositivos, confiabilidad</li>
+          </ul>
+        </section>
+
+        <!-- 15 UART -->
+        <section class="slide" data-slide="15" aria-hidden="true">
+          <span class="slide-num">15 / 26</span>
+          <h2>UART — Universal Asynchronous Receiver-Transmitter</h2>
+          <figure class="media-placeholder" data-image-url="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmHZGXtOKyfqELWKE8x7SkJJ63fPIzn2wV3A&s" data-image-alt="">
+            <div class="media-placeholder-frame">
+              <div class="media-placeholder-fallback" aria-hidden="true">
+                <span class="media-placeholder-icon">▢</span>
+                <span class="media-placeholder-title">Imagen</span>
+              </div>
+            </div>
+           
+          </figure>
+          <ul>
+            <li><strong>Tipo:</strong> Comunicación serial asíncrona</li>
+            <li><strong>Líneas:</strong> TX (transmisión) y RX (recepción)</li>
+            <li><strong>Velocidades:</strong> 9600, 115200 bps, etc.</li>
+            <li><strong>Características:</strong> Bits de inicio, parada y paridad</li>
+            <li><strong>Topología:</strong> Punto a punto</li>
+            <li><strong>Ventaja:</strong> Simplicidad de implementación</li>
+          </ul>
+        </section>
+
+        <!-- 16 SPI -->
+        <section class="slide" data-slide="16" aria-hidden="true">
+          <span class="slide-num">16 / 26</span>
+          <h2>SPI — Serial Peripheral Interface</h2>
+          <figure class="media-placeholder" data-image-url="https://swisskyrepo.github.io/HardwareAllTheThings/assets/hydra-spi.png" data-image-alt="">
+            <div class="media-placeholder-frame">
+              <div class="media-placeholder-fallback" aria-hidden="true">
+                <span class="media-placeholder-icon">▢</span>
+                <span class="media-placeholder-title">Imagen</span>
+              </div>
+            </div>
+            
+          </figure>
+          <ul>
+            <li><strong>Tipo:</strong> Comunicación serial síncrona de alta velocidad</li>
+            <li><strong>Líneas (4):</strong>
+              <ul class="nested">
+                <li>MOSI: Master Out Slave In</li>
+                <li>MISO: Master In Slave Out</li>
+                <li>SCK: Serial Clock (generada por maestro)</li>
+                <li>SS/CS: Slave Select / Chip Select</li>
+              </ul>
+            </li>
+            <li><strong>Ventajas:</strong> Velocidad alta, soporta múltiples esclavos</li>
+            <li><strong>Aplicaciones:</strong> Memorias flash, displays, conversores ADC externos</li>
+          </ul>
+        </section>
+
+        <!-- 17 I2C -->
+        <section class="slide" data-slide="17" aria-hidden="true">
+          <span class="slide-num">17 / 26</span>
+          <h2>I²C — Inter-Integrated Circuit</h2>
+          <figure class="media-placeholder" data-image-url="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0fkOpw6oX61QPA2IIKNYn63w1KfHyQ9ggFA&s" data-image-alt="">
+            <div class="media-placeholder-frame">
+              <div class="media-placeholder-fallback" aria-hidden="true">
+                <span class="media-placeholder-icon">▢</span>
+                <span class="media-placeholder-title">Imagen</span>
+              </div>
+            </div>
+          </figure>
+          <ul>
+            <li><strong>Tipo:</strong> Protocolo de bus compartido</li>
+            <li><strong>Líneas (2):</strong>
+              <ul class="nested">
+                <li>SDA: Serial Data (bidireccional)</li>
+                <li>SCL: Serial Clock</li>
+              </ul>
+            </li>
+            <li><strong>Direccionamiento:</strong> Cada dispositivo tiene dirección única</li>
+            <li><strong>Ventaja:</strong> Solo dos líneas para múltiples dispositivos</li>
+            <li><strong>Aplicaciones:</strong> Sensores, memorias EEPROM, expansores de E/S</li>
+          </ul>
+        </section>
+
+        <!-- 18 CAN -->
+        <section class="slide" data-slide="18" aria-hidden="true">
+          <span class="slide-num">18 / 26</span>
+          <h2>CAN — Controller Area Network</h2>
+          <figure class="media-placeholder" data-image-url="https://itrelease.com/wp-content/uploads/2021/10/Controller-area-network.jpg" data-image-alt="">
+            <div class="media-placeholder-frame">
+              <div class="media-placeholder-fallback" aria-hidden="true">
+                <span class="media-placeholder-icon">▢</span>
+                <span class="media-placeholder-title">Imagen</span>
+              </div>
+            </div>
+          </figure>
+          <ul>
+            <li><strong>Diseño:</strong> Aplicaciones automotrices e industriales</li>
+            <li><strong>Características:</strong>
+              <ul class="nested">
+                <li>Alta confiabilidad</li>
+                <li>Detección y corrección de errores</li>
+                <li>Priorización de mensajes</li>
+                <li>Operación en ambientes con ruido electromagnético</li>
+              </ul>
+            </li>
+            <li><strong>Aplicaciones:</strong> Sistemas de control vehicular, automatización industrial</li>
+          </ul>
+        </section>
+
+        <!-- 19 -->
+        <section class="slide" data-slide="19" aria-hidden="true">
+          <span class="slide-num">19 / 26</span>
+          <h2>Otras Interfaces — USB, Ethernet, Wi-Fi</h2>
+          <figure class="media-placeholder" data-image-url="https://www.steren.com.mx/media/catalog/product/cache/bb0cad18a6adb5d17b0efd58f4201a2f/image/22018e591/adaptador-usb-a-fast-ethernet-rj45-con-hub.jpg" data-image-alt="">
+            <div class="media-placeholder-frame">
+              <div class="media-placeholder-fallback" aria-hidden="true">
+                <span class="media-placeholder-icon">▢</span>
+                <span class="media-placeholder-title">Imagen</span>
+              </div>
+            </div>
+          </figure>
+          <ul>
+            <li><strong>USB:</strong> Conexión estándar a computadoras, función como dispositivo o host</li>
+            <li><strong>Ethernet:</strong> Conectividad de red cableada</li>
+            <li><strong>Wi-Fi:</strong> Conectividad inalámbrica</li>
+            <li><strong>Aplicaciones:</strong> IoT, monitoreo remoto, sistemas en red</li>
+          </ul>
+        </section>
+
+        <!-- 20 Tabla -->
+        <section class="slide" data-slide="20" aria-hidden="true">
+          <span class="slide-num">20 / 26</span>
+          <h2>Comparación de Interfaces</h2>
+          <figure class="media-placeholder media-placeholder--sm" data-image-url="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThEM_zRAFYLVevcG82NisEPbdG5Z67cy1D3A&s" data-image-alt="">
+            <div class="media-placeholder-frame">
+              <div class="media-placeholder-fallback" aria-hidden="true">
+                <span class="media-placeholder-icon">▢</span>
+                <span class="media-placeholder-title">Imagen</span>
+              </div>
+            </div>
+          </figure>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Interface</th>
+                  <th>Velocidad</th>
+                  <th>Líneas</th>
+                  <th>Topología</th>
+                  <th>Aplicación típica</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>UART</td>
+                  <td>Baja-Media</td>
+                  <td>2</td>
+                  <td>Punto a punto</td>
+                  <td>Debug, GPS, módems</td>
+                </tr>
+                <tr>
+                  <td>SPI</td>
+                  <td>Alta</td>
+                  <td>4+</td>
+                  <td>Maestro-esclavos</td>
+                  <td>Memorias, displays</td>
+                </tr>
+                <tr>
+                  <td>I²C</td>
+                  <td>Media</td>
+                  <td>2</td>
+                  <td>Bus compartido</td>
+                  <td>Sensores, expansores</td>
+                </tr>
+                <tr>
+                  <td>CAN</td>
+                  <td>Media</td>
+                  <td>2</td>
+                  <td>Bus robusto</td>
+                  <td>Automotriz, industrial</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 21 -->
+        <section class="slide" data-slide="21" aria-hidden="true">
+          <span class="slide-num">21 / 26</span>
+          <h2>Integración de Componentes — Ejemplo Práctico</h2>
+          <figure class="media-placeholder" data-image-url="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTuqk44JTTSUY5MBd96hcpkCqD0sqSJZea2Xw&s" data-image-alt="">
+            <div class="media-placeholder-frame">
+              <div class="media-placeholder-fallback" aria-hidden="true">
+                <span class="media-placeholder-icon">▢</span>
+                <span class="media-placeholder-title">Imagen</span>
+              </div>
+            </div>
+          </figure>
+          <p style="margin-bottom:0.5rem;font-weight:600;">Sistema de control de temperatura:</p>
+          <ul>
+            <li><strong>Puerto analógico:</strong> Lee sensor de temperatura (ADC)</li>
+            <li><strong>Temporizador:</strong> Genera señal PWM para controlar ventilador</li>
+            <li><strong>Puerto digital:</strong> Activa relé del sistema de calefacción</li>
+            <li><strong>UART:</strong> Envía datos a computadora para monitoreo</li>
+            <li><strong>I²C:</strong> Lee configuración desde memoria EEPROM</li>
+          </ul>
+        </section>
+
+        <!-- 22 -->
+        <section class="slide" data-slide="22" aria-hidden="true">
+          <span class="slide-num">22 / 26</span>
+          <h2>Consideraciones de Diseño</h2>
+          <figure class="media-placeholder" data-image-url="https://calidevs.com/wp-content/uploads/2022/04/f7297a6c-f759-4cc9-98b0-b66024cd88e4.png" data-image-alt="">
+            <div class="media-placeholder-frame">
+              <div class="media-placeholder-fallback" aria-hidden="true">
+                <span class="media-placeholder-icon">▢</span>
+                <span class="media-placeholder-title">Imagen</span>
+              </div>
+            </div>
+          </figure>
+          <ul>
+            <li><strong>Selección de interface:</strong> Según velocidad, distancia y número de dispositivos</li>
+            <li><strong>Gestión de interrupciones:</strong> Optimizar tiempos de respuesta</li>
+            <li><strong>Consumo de energía:</strong> Uso eficiente de temporizadores y modos de bajo consumo</li>
+            <li><strong>Robustez:</strong> Protección contra ruido y errores de comunicación</li>
+          </ul>
+        </section>
+
+        <!-- 23 -->
+        <section class="slide" data-slide="23" aria-hidden="true">
+          <span class="slide-num">23 / 26</span>
+          <h2>Conclusiones (1/2)</h2>
+          <ul>
+            <li>Los <strong>puertos digitales</strong> proporcionan la base para interacciones binarias esenciales</li>
+            <li>Los <strong>puertos analógicos</strong> extienden las capacidades al dominio de señales continuas</li>
+            <li>Ambos tipos de puertos son fundamentales para la interacción con el entorno físico</li>
+          </ul>
+        </section>
+
+        <!-- 24 -->
+        <section class="slide" data-slide="24" aria-hidden="true">
+          <span class="slide-num">24 / 26</span>
+          <h2>Conclusiones (2/2)</h2>
+          <ul>
+            <li>Los <strong>temporizadores</strong> son críticos para sincronización precisa y determinismo temporal</li>
+            <li>Las <strong>interfaces de comunicación</strong> permiten interconexión y colaboración entre sistemas</li>
+            <li>La selección apropiada de componentes es clave para el éxito del diseño embebido</li>
+          </ul>
+        </section>
+
+        <!-- 25 Referencias -->
+        <section class="slide" data-slide="25" aria-hidden="true">
+          <span class="slide-num">25 / 26</span>
+          <h2>Referencias</h2>
+          <figure class="media-placeholder media-placeholder--sm" data-image-url="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTCZblHOaW7QlGwI5r3OGQqiRULL1o7IbYS-Q&s" data-image-alt="">
+            <div class="media-placeholder-frame">
+              <div class="media-placeholder-fallback" aria-hidden="true">
+                <span class="media-placeholder-icon">▢</span>
+                <span class="media-placeholder-title">Imagen</span>
+              </div>
+            </div>
+          </figure>
+          <div class="refs">
+            <p>Barrett, S. F., &amp; Pack, D. J. (2006). <em>Embedded systems: Design and applications with the 68HC12 and HCS12</em>. Pearson Prentice Hall.</p>
+            <p>Valvano, J. W. (2012). <em>Embedded systems: Introduction to ARM Cortex-M microcontrollers</em> (5th ed.). Jonathan Valvano.</p>
+            <p>Wilmshurst, T. (2009). <em>Designing embedded systems with PIC microcontrollers: Principles and applications</em> (2nd ed.). Newnes.</p>
+          </div>
+        </section>
+
+        <!-- 26 QA -->
+        <section class="slide cover" data-slide="26" aria-hidden="true">
+          <span class="slide-num">26 / 26</span>
+          <figure class="media-placeholder media-placeholder--qa" data-image-url="https://static.vecteezy.com/system/resources/previews/003/483/442/non_2x/questions-concept-people-ask-frequently-asked-questions-faq-vector.jpg" data-image-alt="">
+            <div class="media-placeholder-frame">
+              <div class="media-placeholder-fallback" aria-hidden="true">
+                <span class="media-placeholder-icon">▢</span>
+                <span class="media-placeholder-title">Imagen</span>
+              </div>
+            </div>
+          </figure>
+          <p class="qa">¿Preguntas?</p>
+        </section>
+      </div>
+    </div>
+
+    <footer class="bar">
+      <button type="button" id="prev" aria-label="Diapositiva anterior">Anterior</button>
+      <span class="hint" id="hint">← → o espacio · Inicio / Fin</span>
+      <div class="dots" id="dots" aria-hidden="true"></div>
+      <button type="button" id="next" aria-label="Diapositiva siguiente">Siguiente</button>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      document.querySelectorAll("figure.media-placeholder").forEach(function (fig) {
+        var url = (fig.getAttribute("data-image-url") || "").trim();
+        if (!url) return;
+        var alt = (fig.getAttribute("data-image-alt") || "").trim();
+        var frame = fig.querySelector(".media-placeholder-frame");
+        if (!frame) return;
+        var fallback = frame.querySelector(".media-placeholder-fallback");
+        var img = document.createElement("img");
+        img.className = "slide-media";
+        img.src = url;
+        img.alt = alt;
+        img.decoding = "async";
+        if (fig.getAttribute("data-image-priority") === "high") {
+          img.fetchPriority = "high";
+        }
+        frame.insertBefore(img, frame.firstChild);
+        if (fallback) fallback.remove();
+      });
+
+      const slides = Array.from(document.querySelectorAll(".slide"));
+      const total = slides.length;
+      let index = 0;
+
+      const prevBtn = document.getElementById("prev");
+      const nextBtn = document.getElementById("next");
+      const dotsContainer = document.getElementById("dots");
+
+      slides.forEach(function (_, i) {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.setAttribute("aria-label", "Ir a diapositiva " + (i + 1));
+        b.addEventListener("click", function () { go(i); });
+        dotsContainer.appendChild(b);
+      });
+
+      const dotButtons = Array.from(dotsContainer.querySelectorAll("button"));
+
+      function update() {
+        slides.forEach(function (el, i) {
+          const on = i === index;
+          el.classList.toggle("active", on);
+          el.setAttribute("aria-hidden", on ? "false" : "true");
+        });
+        dotButtons.forEach(function (b, i) {
+          b.classList.toggle("active", i === index);
+        });
+        prevBtn.disabled = index === 0;
+        nextBtn.disabled = index === total - 1;
+        document.title = "Sistemas Embebidos — " + (index + 1) + "/" + total;
+      }
+
+      function go(i) {
+        index = Math.max(0, Math.min(total - 1, i));
+        update();
+      }
+
+      prevBtn.addEventListener("click", function () { go(index - 1); });
+      nextBtn.addEventListener("click", function () { go(index + 1); });
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") {
+          e.preventDefault();
+          go(index + 1);
+        } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+          e.preventDefault();
+          go(index - 1);
+        } else if (e.key === "Home") {
+          e.preventDefault();
+          go(0);
+        } else if (e.key === "End") {
+          e.preventDefault();
+          go(total - 1);
+        }
+      });
+
+      let touchStartX = null;
+      document.getElementById("deck").addEventListener("touchstart", function (e) {
+        touchStartX = e.changedTouches[0].screenX;
+      }, { passive: true });
+      document.getElementById("deck").addEventListener("touchend", function (e) {
+        if (touchStartX == null) return;
+        const dx = e.changedTouches[0].screenX - touchStartX;
+        touchStartX = null;
+        if (Math.abs(dx) < 40) return;
+        if (dx < 0) go(index + 1);
+        else go(index - 1);
+      }, { passive: true });
+
+      update();
+    })();
+  </script>
+</body>
+</html>
